@@ -1,18 +1,18 @@
-
 import { Bell, Search, User, LogIn, UserPlus, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLocation } from "react-router-dom";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 const getBreadcrumbTitle = (path: string) => {
   switch (path) {
@@ -41,21 +41,25 @@ export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const title = getBreadcrumbTitle(location.pathname);
-  
-  // Add authentication state (you should replace this with your actual auth state management)
-  const isAuthenticated = false; // Replace with your auth check
-  
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token);
+  }, []);
+
   const handleLogin = () => {
-    navigate('/login');
+    navigate("/login");
   };
 
   const handleSignup = () => {
-    navigate('/signup');
+    navigate("/signup");
   };
 
   const handleLogout = () => {
-    // Add your logout logic here
-    navigate('/login');
+    localStorage.clear();
+    navigate("/login");
   };
 
   return (
@@ -65,7 +69,12 @@ export function Header() {
         <nav className="flex" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-2">
             <li className="inline-flex items-center">
-              <a href="/" className="text-sm text-pharmacy-primary hover:text-pharmacy-secondary">Home</a>
+              <a
+                href="/"
+                className="text-sm text-pharmacy-primary hover:text-pharmacy-secondary"
+              >
+                Home
+              </a>
             </li>
             {location.pathname !== "/" && (
               <>
@@ -82,12 +91,10 @@ export function Header() {
       </div>
       <div className="flex items-center gap-x-4">
         <div className="relative hidden md:block">
-          <Search 
-            className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" 
-          />
-          <Input 
-            placeholder="Search..." 
-            className="w-64 pl-9 rounded-full bg-gray-50 focus-visible:ring-pharmacy-primary" 
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+          <Input
+            placeholder="Search..."
+            className="w-64 pl-9 rounded-full bg-gray-50 focus-visible:ring-pharmacy-primary"
           />
         </div>
 
@@ -97,7 +104,9 @@ export function Header() {
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar>
                   <AvatarImage src="" alt="Admin" />
-                  <AvatarFallback className="bg-pharmacy-primary text-white">AD</AvatarFallback>
+                  <AvatarFallback className="bg-pharmacy-primary text-white">
+                    AD
+                  </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>

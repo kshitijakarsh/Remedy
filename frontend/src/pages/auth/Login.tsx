@@ -1,42 +1,69 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Pill, Lock, LogIn } from "lucide-react";
+import axios from "axios";
 
 export default function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (error) setError("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    // Simulate API call
-    setTimeout(() => {
-      // For demo, let's just accept "admin@example.com" with "password123"
-      if (formData.email === "admin@example.com" && formData.password === "password123") {
-        // In a real app, you would store the authenticated user in context or Redux
-        navigate("/");
-      } else {
-        setError("Invalid email or password");
-      }
+    if (!formData.email || !formData.password) {
+      setError("Please fill out all fields.");
       setIsLoading(false);
-    }, 1000);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/users/login",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const { token, user } = response.data;
+      if (!token || !user) throw new Error("Invalid response from server");
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      navigate("/dashboard");
+    } catch (err: any) {
+      const message =
+        err.response?.data?.message || "Login failed. Please try again.";
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -53,11 +80,14 @@ export default function Login() {
 
         <Card>
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Admin Login</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">
+              Admin Login
+            </CardTitle>
             <CardDescription className="text-center">
               Enter your credentials to access the pharmacy management system
             </CardDescription>
           </CardHeader>
+
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               {error && (
@@ -101,15 +131,19 @@ export default function Login() {
                 </div>
               </div>
             </CardContent>
+
             <CardFooter>
-              <Button 
-                className="w-full bg-pharmacy-primary hover:bg-pharmacy-secondary" 
+              <Button
+                className="w-full bg-pharmacy-primary hover:bg-pharmacy-secondary"
                 type="submit"
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <div className="flex items-center">
-                    <svg className="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                    <svg
+                      className="mr-2 h-4 w-4 animate-spin"
+                      viewBox="0 0 24 24"
+                    >
                       <circle
                         className="opacity-25"
                         cx="12"
@@ -135,7 +169,7 @@ export default function Login() {
             </CardFooter>
           </form>
         </Card>
-        
+
         <div className="mt-4 text-center text-sm text-gray-500">
           For demo, use: admin@example.com / password123
         </div>

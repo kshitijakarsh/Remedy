@@ -20,7 +20,6 @@ const Home: React.FC = (): JSX.Element => {
           <div className="hidden md:flex space-x-8">
             <a href="#features" className="text-gray-700 hover:text-pharmacy-primary font-medium transition-colors duration-300">Features</a>
             <a href="#benefits" className="text-gray-700 hover:text-pharmacy-primary font-medium transition-colors duration-300">Benefits</a>
-            <a href="#contact" className="text-gray-700 hover:text-pharmacy-primary font-medium transition-colors duration-300">Contact</a>
           </div>
           <button 
             className="bg-pharmacy-primary hover:bg-pharmacy-secondary text-white font-semibold py-2.5 px-6 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-pharmacy-primary focus:ring-offset-2" 
@@ -31,14 +30,14 @@ const Home: React.FC = (): JSX.Element => {
         </div>
       </nav>
 
-      <section className="pt-28 pb-16 container mx-auto px-6">
+      <section className="pt-52 pb-16 container mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center gap-12">
           <div className="md:w-1/2 space-y-8">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
               Modern Pharmacy Management Made{' '}
               <span className="text-pharmacy-primary">Simple</span>
             </h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
+            <p className="text-lg sm:text-xl text-gray-600 leading-relaxed">
               Streamline your pharmacy operations with our comprehensive digital solution. From inventory control to customer management, Remedy helps you focus on what truly matters - your patients.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -60,7 +59,7 @@ const Home: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      {/* Features section with enhanced cards */}
+      {/* Features section */}
       <section id="features" className="py-20 bg-gradient-to-b from-white to-pharmacy-light/30">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
@@ -68,7 +67,7 @@ const Home: React.FC = (): JSX.Element => {
             <p className="text-xl text-gray-600">Everything you need to run your pharmacy efficiently</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             <Feature 
               icon={
                 <svg className="h-10 w-10 text-pharmacy-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -101,7 +100,7 @@ const Home: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      {/* Benefits section with improved layout */}
+      {/* Benefits section */}
       <section id="benefits" className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center gap-12">
@@ -125,7 +124,7 @@ const Home: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      {/* CTA section with enhanced gradient */}
+      {/* CTA section */}
       <section className="py-20 bg-gradient-to-r from-pharmacy-primary via-pharmacy-secondary to-pharmacy-primary bg-[length:200%_100%] animate-gradient">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold text-white mb-8">Ready to Transform Your Pharmacy?</h2>
@@ -143,11 +142,11 @@ const Home: React.FC = (): JSX.Element => {
         </div>
       </section>
 
-      {/* Footer with enhanced design */}
+      {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-            {/* Keep your existing footer content with enhanced styling */}
+            {/* Footer content */}
           </div>
         </div>
       </footer>
@@ -155,7 +154,7 @@ const Home: React.FC = (): JSX.Element => {
   );
 };
 
-// Enhanced Feature component
+// Feature Component
 const Feature: React.FC<FeatureProps> = ({ icon, title, description }) => {
   return (
     <div className="bg-white rounded-2xl shadow-lg p-8 transition-all duration-300 hover:shadow-2xl hover:transform hover:scale-105">

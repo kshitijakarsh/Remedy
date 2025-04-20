@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
-import Login from "@/pages/Login";
+import Login from "@/pages/auth/Login";
 import Home from "@/pages/Home";
 
 // Import Pages
@@ -18,7 +18,7 @@ import CustomersList from "@/pages/customers/CustomersList";
 import SuppliersList from "@/pages/suppliers/SuppliersList";
 import ReportsAnalytics from "@/pages/reports/ReportsAnalytics";
 import NotFound from "@/pages/NotFound";
-import Signup from "@/pages/Signup";
+import Signup from "@/pages/auth/Signup";
 
 const queryClient = new QueryClient();
 
