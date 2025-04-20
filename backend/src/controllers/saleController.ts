@@ -1,10 +1,11 @@
+// controllers/saleController.ts
 import { Request, Response } from "express";
 import { ObjectId } from "mongoose";
 import Sale from "../models/saleSchema";
 import { Medicine } from "../models/medicineSchema";
 import Customer from "../models/customerSchema";
-import Invoice from "../models/invoice";
 
+// Define interfaces for SaleItem and Customer for type safety
 interface SaleItem {
   medicineId: ObjectId;
   medicineName: string;
@@ -13,6 +14,13 @@ interface SaleItem {
   total: number;
 }
 
+interface Customer {
+  name: string;
+  address: string;
+  phone: string;
+}
+
+// Create a new sale
 export const createNewSale = async (
   req: Request,
   res: Response
@@ -39,6 +47,7 @@ export const createNewSale = async (
       return res.status(400).json({ message: "Customer not found" });
     }
 
+    // Loop through the items and check stock for each medicine
     for (let item of items) {
       const medicine = await Medicine.findById(item.medicineId);
       if (!medicine) {
@@ -47,16 +56,19 @@ export const createNewSale = async (
           .json({ message: `Medicine not found: ${item.medicineName}` });
       }
 
+      // Check if there is enough stock
       if (medicine.stock < item.quantity) {
         return res
           .status(400)
           .json({ message: `Not enough stock for ${medicine.name}` });
       }
 
+      // Decrease the stock for the medicine
       medicine.stock -= item.quantity;
       await medicine.save();
     }
 
+    // Create a new sale document
     const newSale = new Sale({
       customerId,
       paymentMethod,
@@ -67,6 +79,8 @@ export const createNewSale = async (
     });
 
     await newSale.save();
+
+    // Respond with success
     res
       .status(201)
       .json({ message: "Sale created successfully", sale: newSale });
@@ -76,6 +90,7 @@ export const createNewSale = async (
   }
 };
 
+// Fetch all customers
 export const getAllCustomers = async (
   _req: Request,
   res: Response
@@ -89,6 +104,7 @@ export const getAllCustomers = async (
   }
 };
 
+// Fetch all medicines
 export const getAllMedicines = async (
   _req: Request,
   res: Response
@@ -102,46 +118,12 @@ export const getAllMedicines = async (
   }
 };
 
-export const getInvoiceById = async (req: Request, res: Response) => {
+export const getAllSales = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-
-    const invoice = await Invoice.findById(id)
-      .populate("customer")
-      .populate("items.medicine");
-
-    if (!invoice) {
-      return res.status(404).json({ message: "Invoice not found" });
-    }
-
-    const formattedInvoice = {
-      id: invoice._id,
-      invoiceNumber: invoice.invoiceNumber,
-      date: invoice.date,
-      customer: {
-        name: invoice.customer?.name ?? "N/A",  // Use nullish coalescing (??) to fallback to "N/A" if it's null or undefined
-        address: invoice.customer?.address ?? "N/A",
-        phone: invoice.customer?.phone ?? "N/A",
-      }
-      
-
-      items: invoice.items.map((item) => ({
-        id: item._id,
-        name: (item.medicine as any)?.name || "Unknown Medicine",
-        quantity: item.quantity,
-        price: item.price,
-        total: item.total,
-      })),
-
-      subtotal: invoice.subtotal,
-      tax: invoice.tax,
-      total: invoice.total,
-      paymentMethod: invoice.paymentMethod,
-    };
-
-    res.json(formattedInvoice);
-  } catch (error) {
-    console.error("Error fetching invoice:", error);
-    res.status(500).json({ message: "Server error" });
+    const sales = await Sale.find();
+    res.status(200).json(sales);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch sales" });
   }
 };

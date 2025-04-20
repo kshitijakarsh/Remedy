@@ -12,7 +12,6 @@ import MedicineList from "@/pages/medicine/MedicineList";
 import MedicineForm from "@/pages/medicine/MedicineForm";
 import SalesList from "@/pages/sales/SalesList";
 import NewSale from "@/pages/sales/NewSale";
-import SaleInvoice from "@/pages/sales/SaleInvoice";
 import CustomersList from "@/pages/customers/CustomersList";
 import SuppliersList from "@/pages/suppliers/SuppliersList";
 import ReportsAnalytics from "@/pages/reports/ReportsAnalytics";
@@ -45,7 +44,6 @@ const App = () => (
             <Route path="sales">
               <Route index element={<SalesList />} />
               <Route path="new" element={<NewSale />} />
-              <Route path=":id/invoice" element={<SaleInvoice />} />
             </Route>
 
             <Route path="customers">
