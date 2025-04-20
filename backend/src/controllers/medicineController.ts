@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Medicine from "../models/medicineSchema";
+import Order from "../models/orderSchema";
 
 export const createMedicine = async (
   req: Request,
@@ -31,7 +31,7 @@ export const createMedicine = async (
         .json({ message: "Please provide all required fields." });
     }
 
-    const newMedicine = new Medicine({
+    const newMedicine = new Order({
       name,
       description,
       batchNumber,
@@ -61,7 +61,7 @@ export const getAllMedicines = async (
   res: Response
 ): Promise<any> => {
   try {
-    const medicines = await Medicine.find();
+    const medicines = await Order.find();
     return res.status(200).json(medicines);
   } catch (error) {
     console.error(error);
@@ -76,7 +76,7 @@ export const getMedicineById = async (
   res: Response
 ): Promise<any> => {
   try {
-    const medicine = await Medicine.findById(req.params.id);
+    const medicine = await Order.findById(req.params.id);
 
     if (!medicine) {
       return res.status(404).json({ message: "Medicine not found." });
@@ -107,7 +107,7 @@ export const updateMedicine = async (
       supplier,
     } = req.body;
 
-    const updatedMedicine = await Medicine.findByIdAndUpdate(
+    const updatedMedicine = await Order.findByIdAndUpdate(
       req.params.id,
       {
         name,
@@ -143,7 +143,7 @@ export const deleteMedicine = async (
   res: Response
 ): Promise<any> => {
   try {
-    const deletedMedicine = await Medicine.findByIdAndDelete(req.params.id);
+    const deletedMedicine = await Order.findByIdAndDelete(req.params.id);
 
     if (!deletedMedicine) {
       return res.status(404).json({ message: "Medicine not found." });

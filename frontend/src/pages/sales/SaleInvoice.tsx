@@ -1,76 +1,78 @@
-
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { PageTitle } from "@/components/ui/page-title";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft, Download, Printer } from "lucide-react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 
-// Sample invoice data
-const invoiceData = {
-  id: "1",
-  invoiceNumber: "INV-2025-001",
-  date: "April 15, 2025",
-  customer: {
-    name: "John Doe",
-    address: "123 Main Street, Cityville, State, 12345",
-    phone: "(555) 123-4567"
-  },
-  items: [
-    {
-      id: "1",
-      name: "Paracetamol 500mg",
-      quantity: 2,
-      price: 9.99,
-      total: 19.98
-    },
-    {
-      id: "2",
-      name: "Vitamin C 1000mg",
-      quantity: 1,
-      price: 12.75,
-      total: 12.75
-    },
-    {
-      id: "3",
-      name: "Ibuprofen 400mg",
-      quantity: 1,
-      price: 8.50,
-      total: 8.50
-    }
-  ],
-  subtotal: 41.23,
-  tax: 2.89,
-  total: 44.12,
-  paymentMethod: "Cash"
-};
+interface InvoiceItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  total: number;
+}
+
+interface Customer {
+  name: string;
+  address: string;
+  phone: string;
+}
+
+interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  date: string;
+  customer: Customer;
+  items: InvoiceItem[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  paymentMethod: string;
+}
 
 export default function SaleInvoice() {
-  const { id } = useParams();
-  
-  const handlePrint = () => {
-    window.print();
-  };
-  
+  const { id } = useParams<{ id: string }>();
+  const [invoiceData, setInvoiceData] = useState<Invoice | null>(null);
+
+  useEffect(() => {
+    async function fetchInvoice() {
+      try {
+        const response = await fetch(`http://localhost:3000/api/invoices/${id}`);
+        const data = await response.json();
+        setInvoiceData(data);
+      } catch (error) {
+        console.error("Error fetching invoice:", error);
+      }
+    }
+
+    fetchInvoice();
+  }, [id]);
+
+  const handlePrint = () => window.print();
+
   const handleDownload = () => {
-    // In a real app, this would generate and download a PDF invoice
-    console.log("Downloading invoice PDF...");
-    alert("PDF download feature would be implemented here");
+    alert("PDF download feature would be implemented here.");
   };
-  
+
+  if (!invoiceData) {
+    return <div>Loading invoice...</div>;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <PageTitle 
-          title="Invoice" 
+        <PageTitle
+          title="Invoice"
           description={`Invoice #${invoiceData.invoiceNumber}`}
         />
         <div className="flex space-x-2 print:hidden">
@@ -87,7 +89,7 @@ export default function SaleInvoice() {
           </Link>
         </div>
       </div>
-      
+
       <Card>
         <CardHeader className="pb-0">
           <div className="flex flex-col md:flex-row justify-between">
@@ -109,7 +111,7 @@ export default function SaleInvoice() {
             </div>
           </div>
         </CardHeader>
-        
+
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
@@ -125,9 +127,9 @@ export default function SaleInvoice() {
               <p className="text-sm text-gray-500">(555) 987-6543</p>
             </div>
           </div>
-          
+
           <Separator className="my-6" />
-          
+
           <h4 className="font-semibold mb-4">Items</h4>
           <div className="rounded-md border">
             <Table>
@@ -140,7 +142,7 @@ export default function SaleInvoice() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {invoiceData.items.map(item => (
+                {invoiceData.items.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>{item.name}</TableCell>
                     <TableCell className="text-right">{item.quantity}</TableCell>
@@ -151,7 +153,7 @@ export default function SaleInvoice() {
               </TableBody>
             </Table>
           </div>
-          
+
           <div className="mt-6 flex flex-col items-end">
             <div className="w-full sm:w-80 space-y-2">
               <div className="flex justify-between text-sm">
@@ -173,9 +175,9 @@ export default function SaleInvoice() {
               </div>
             </div>
           </div>
-          
+
           <Separator className="my-6" />
-          
+
           <div className="text-center text-sm text-gray-500">
             <p>Thank you for your business!</p>
             <p className="mt-1">For any queries related to this invoice, please contact our pharmacy.</p>

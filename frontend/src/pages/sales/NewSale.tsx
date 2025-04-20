@@ -1,48 +1,28 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { PageTitle } from "@/components/ui/page-title";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, Calculator } from "lucide-react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-// Sample customers for dropdown
-const customers = [
-  { id: "1", name: "John Doe" },
-  { id: "2", name: "Jane Smith" },
-  { id: "3", name: "Bob Johnson" },
-  { id: "4", name: "Alice Williams" }
-];
-
-// Sample medicines for dropdown
-const medicines = [
-  { id: "1", name: "Paracetamol 500mg", price: 9.99, stock: 120 },
-  { id: "2", name: "Amoxicillin 250mg", price: 15.50, stock: 85 },
-  { id: "3", name: "Aspirin 100mg", price: 5.25, stock: 200 },
-  { id: "4", name: "Vitamin C 1000mg", price: 12.75, stock: 8 },
-  { id: "5", name: "Ibuprofen 400mg", price: 8.50, stock: 95 },
-  { id: "6", name: "Cetirizine 10mg", price: 11.25, stock: 15 },
-];
-
-// Payment methods
 const paymentMethods = ["Cash", "Credit Card", "Debit Card", "Mobile Payment"];
+
+interface Customer {
+  _id: string;
+  name: string;
+}
+
+interface Medicine {
+  _id: string;
+  name: string;
+  price: number;
+  stock: number;
+}
 
 interface SaleItem {
   id: string;
@@ -55,62 +35,77 @@ interface SaleItem {
 
 export default function NewSale() {
   const navigate = useNavigate();
-  
+
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [medicines, setMedicines] = useState<Medicine[]>([]);
+
   const [customerId, setCustomerId] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [items, setItems] = useState<SaleItem[]>([]);
   const [selectedMedicine, setSelectedMedicine] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
-  
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [customerRes, medicineRes] = await Promise.all([
+          axios.get("http://localhost:3000/api/sales/customers"),
+          axios.get("http://localhost:3000/api/sales/medicines")
+        ]);
+        setCustomers(customerRes.data);
+        setMedicines(medicineRes.data);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+    fetchData();
+  }, []);
+
   const handleAddItem = () => {
     if (!selectedMedicine || quantity <= 0) return;
-    
-    const medicine = medicines.find(med => med.id === selectedMedicine);
+
+    const medicine = medicines.find(med => med._id === selectedMedicine);
     if (!medicine) return;
-    
+
     const newItem: SaleItem = {
       id: Date.now().toString(),
-      medicineId: medicine.id,
+      medicineId: medicine._id,
       medicineName: medicine.name,
-      quantity: quantity,
+      quantity,
       price: medicine.price,
-      total: medicine.price * quantity
+      total: medicine.price * quantity,
     };
-    
+
     setItems(prev => [...prev, newItem]);
     setSelectedMedicine("");
     setQuantity(1);
   };
-  
+
   const handleRemoveItem = (id: string) => {
     setItems(prev => prev.filter(item => item.id !== id));
   };
-  
-  const calculateSubtotal = () => {
-    return items.reduce((sum, item) => sum + item.total, 0);
-  };
-  
-  const calculateTax = () => {
-    return calculateSubtotal() * 0.07; // Assuming 7% tax
-  };
-  
-  const calculateTotal = () => {
-    return calculateSubtotal() + calculateTax();
-  };
-  
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const calculateSubtotal = () => items.reduce((sum, item) => sum + item.total, 0);
+  const calculateTax = () => calculateSubtotal() * 0.07;
+  const calculateTotal = () => calculateSubtotal() + calculateTax();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Sale submitted:", {
-      customerId,
-      paymentMethod,
-      items,
-      subtotal: calculateSubtotal(),
-      tax: calculateTax(),
-      total: calculateTotal()
-    });
-    
-    // In a real app, you would save the sale and generate an invoice
-    navigate("/sales");
+
+    try {
+      await axios.post("http://localhost:3000/api/sales/new", {
+        customerId,
+        paymentMethod,
+        items,
+        subtotal: calculateSubtotal(),
+        tax: calculateTax(),
+        total: calculateTotal(),
+      });
+
+      navigate("/sales");
+    } catch (err) {
+      console.error("Error submitting sale:", err);
+    }
   };
 
   return (
@@ -122,7 +117,6 @@ export default function NewSale() {
       
       <form onSubmit={handleSubmit}>
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Customer Selection and Payment Info */}
           <Card className="lg:col-span-1">
             <CardHeader>
               <CardTitle>Customer & Payment</CardTitle>
@@ -140,14 +134,14 @@ export default function NewSale() {
                   </SelectTrigger>
                   <SelectContent>
                     {customers.map(customer => (
-                      <SelectItem key={customer.id} value={customer.id}>
+                      <SelectItem key={customer._id} value={customer._id}>
                         {customer.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="paymentMethod">Payment Method *</Label>
                 <Select 
@@ -170,14 +164,12 @@ export default function NewSale() {
             </CardContent>
           </Card>
 
-          {/* Sale Items */}
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>Sale Items</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Add new item form */}
                 <div className="flex flex-wrap items-end gap-2">
                   <div className="flex-1 min-w-[200px] space-y-2">
                     <Label htmlFor="medicine">Medicine</Label>
@@ -190,7 +182,7 @@ export default function NewSale() {
                       </SelectTrigger>
                       <SelectContent>
                         {medicines.map(medicine => (
-                          <SelectItem key={medicine.id} value={medicine.id}>
+                          <SelectItem key={medicine._id} value={medicine._id}>
                             {medicine.name} - ${medicine.price.toFixed(2)}
                           </SelectItem>
                         ))}
@@ -218,8 +210,7 @@ export default function NewSale() {
                     </Button>
                   </div>
                 </div>
-                
-                {/* Items table */}
+
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
@@ -256,8 +247,7 @@ export default function NewSale() {
                     </TableBody>
                   </Table>
                 </div>
-                
-                {/* Summary */}
+
                 <div className="mt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Subtotal:</span>

@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes"
 import customerRoutes from "./routes/customerRoutes"
 import medicineRoutes from "./routes/medicineRoutes"
+import analyticsRoutes from "./routes/analyticsRoutes"
 
 dotenv.config();
 
@@ -25,5 +26,7 @@ mongoose
 app.use("/api/users", userRoutes);
 app.use("/api/customers", customerRoutes)
 app.use("/api/medicines", medicineRoutes)
+app.use("/api/analytics", analyticsRoutes);
+
 
 app.listen(3000, () => console.log("Server running on port 3000"));

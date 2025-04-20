@@ -122,16 +122,6 @@ export function Sidebar() {
               ))}
             </nav>
           </div>
-
-          <div className="mt-auto border-t border-gray-200 px-3 py-4">
-            <Button 
-              variant="ghost" 
-              className="flex w-full items-center gap-x-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-pharmacy-light hover:text-pharmacy-primary"
-            >
-              <LogOut size={18} />
-              <span>Log Out</span>
-            </Button>
-          </div>
         </div>
       </aside>
     </>
