@@ -3,6 +3,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes"
+import customerRoutes from "./routes/customerRoutes"
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-app.use("/api/users", userRoutes); 
+app.use("/api/users", userRoutes);
+app.use("/api/customers", customerRoutes)
 
 app.listen(3000, () => console.log("Server running on port 3000"));
