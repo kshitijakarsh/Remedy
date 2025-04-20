@@ -50,32 +50,32 @@ export function Sidebar() {
   const navItems = [
     {
       title: "Dashboard",
-      href: "/",
+      href: "/dashboard",
       icon: LayoutDashboard,
     },
     {
       title: "Medicine",
-      href: "/medicine",
+      href: "/dashboard/medicine",
       icon: Pill,
     },
     {
       title: "Sales",
-      href: "/sales",
+      href: "/dashboard/sales",
       icon: ShoppingCart,
     },
     {
       title: "Customers",
-      href: "/customers",
+      href: "/dashboard/customers",
       icon: Users,
     },
     {
       title: "Suppliers",
-      href: "/suppliers",
+      href: "/dashboard/suppliers",
       icon: Truck,
     },
     {
       title: "Reports",
-      href: "/reports",
+      href: "/dashboard/reports",
       icon: BarChart3,
     },
   ];

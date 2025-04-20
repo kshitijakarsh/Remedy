@@ -81,7 +81,7 @@ export default function CustomersList() {
   return (
     <div className="space-y-6">
       <PageTitle title="Customer Management" description="View and manage your pharmacy customers.">
-        <Link to="/customers/new">
+        <Link to="/dashboard/customers/new">
           <Button className="h-9 bg-pharmacy-primary hover:bg-pharmacy-secondary">
             <Plus className="mr-1 h-4 w-4" /> Add Customer
           </Button>
