@@ -18,6 +18,7 @@ import ReportsAnalytics from "@/pages/reports/ReportsAnalytics";
 import NotFound from "@/pages/NotFound";
 import Signup from "@/pages/auth/Signup";
 import NewCustomer from "./pages/customers/NewCustomer";
+import NewSupplier from "./pages/suppliers/NewSupplier";
 
 const queryClient = new QueryClient();
 
@@ -51,7 +52,10 @@ const App = () => (
               <Route path="new" element={<NewCustomer />} />
             </Route>
 
-            <Route path="suppliers" element={<SuppliersList />} />
+            <Route path="suppliers">
+              <Route index element={<SuppliersList />} />
+              <Route path="new" element={<NewSupplier />} />
+            </Route>
 
             <Route path="reports" element={<ReportsAnalytics />} />
           </Route>

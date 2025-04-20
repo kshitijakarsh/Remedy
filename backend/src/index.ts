@@ -7,6 +7,7 @@ import customerRoutes from "./routes/customerRoutes"
 import medicineRoutes from "./routes/medicineRoutes"
 import analyticsRoutes from "./routes/analyticsRoutes"
 import saleRoutes from "./routes/saleRoutes"
+import supplierRoutes from "./routes/supplierRoutes"
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use("/api/customers", customerRoutes)
 app.use("/api/medicines", medicineRoutes)
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/sale", saleRoutes)
+app.use("/api", supplierRoutes);
 
 
 app.listen(3000, () => console.log("Server running on port 3000"));
