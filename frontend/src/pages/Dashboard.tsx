@@ -1,138 +1,141 @@
-
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { BarChart3, DollarSign, Package, Users } from "lucide-react";
 import { StatCard } from "@/components/ui/stat-card";
 import { PageTitle } from "@/components/ui/page-title";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 import { DataTable } from "@/components/ui/data-table";
 
-// Sample data for charts and tables
-const salesData = [
-  { name: "Jan", total: 1500 },
-  { name: "Feb", total: 2300 },
-  { name: "Mar", total: 3200 },
-  { name: "Apr", total: 2800 },
-  { name: "May", total: 3600 },
-  { name: "Jun", total: 2900 },
-];
+const Dashboard = () => {
+  const [salesData, setSalesData] = useState([]);
+  const [recentSales, setRecentSales] = useState([]);
+  const [lowStockItems, setLowStockItems] = useState([]);
+  const [totalSales, setTotalSales] = useState(0);
+  const [activeCustomers, setActiveCustomers] = useState(0);
+  const [medicineCount, setMedicineCount] = useState(0); // New state for medicine count
 
-const recentSales = [
-  {
-    id: "1",
-    customer: "John Doe",
-    amount: 159.99,
-    status: "Completed",
-    date: "2025-03-12",
-  },
-  {
-    id: "2",
-    customer: "Jane Smith",
-    amount: 95.50,
-    status: "Completed",
-    date: "2025-03-11",
-  },
-  {
-    id: "3",
-    customer: "Bob Johnson",
-    amount: 245.75,
-    status: "Completed",
-    date: "2025-03-10",
-  },
-  {
-    id: "4",
-    customer: "Alice Williams",
-    amount: 76.25,
-    status: "Completed",
-    date: "2025-03-09",
-  },
-];
+  // Fetch Sales Overview
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/analytics/monthly-sales")
+      .then((response) => setSalesData(response.data))
+      .catch((error) => console.error("Error fetching sales data:", error));
+  }, []);
 
-const lowStockItems = [
-  {
-    id: "1",
-    name: "Paracetamol 500mg",
-    stock: 8,
-    threshold: 10,
-    supplier: "ABC Pharmaceuticals",
-  },
-  {
-    id: "2",
-    name: "Amoxicillin 250mg",
-    stock: 5,
-    threshold: 15,
-    supplier: "Med Supplies Inc.",
-  },
-  {
-    id: "3",
-    name: "Vitamin C 1000mg",
-    stock: 3,
-    threshold: 20,
-    supplier: "Health Products Ltd",
-  },
-];
+  // Fetch Recent Sales
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/sale/sales")
+      .then((response) => setRecentSales(response.data))
+      .catch((error) => console.error("Error fetching recent sales:", error));
+  }, []);
 
-const recentSalesColumns = [
-  { key: "customer", title: "Customer" },
-  { key: "amount", title: "Amount", render: (row: any) => `$${row.amount.toFixed(2)}` },
-  { key: "status", title: "Status" },
-  { key: "date", title: "Date" },
-];
+  // Fetch Low Stock Items
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/medicines/all")
+      .then((response) => {
+        // Filter low stock items based on the threshold
+        const lowStock = response.data.filter(
+          (item) => item.stock < item.threshold
+        );
+        setLowStockItems(lowStock);
+        // Set the total medicine count (total number of medicines)
+        setMedicineCount(response.data.length);
+      })
+      .catch((error) =>
+        console.error("Error fetching low stock items:", error)
+      );
+  }, []);
 
-const lowStockColumns = [
-  { key: "name", title: "Medicine" },
-  { key: "stock", title: "Current Stock" },
-  { key: "threshold", title: "Threshold" },
-  { key: "supplier", title: "Supplier" },
-  { 
-    key: "status", 
-    title: "Status", 
-    render: (row: any) => (
-      <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-800">
-        Low Stock
-      </span>
-    ) 
-  },
-];
+  // Fetch Total Sales
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/analytics/monthly-sales")
+      .then((response) => {
+        // Calculate total sales from the monthly data
+        const total = response.data.reduce((acc, item) => acc + item.total, 0);
+        setTotalSales(total);
+      })
+      .catch((error) => console.error("Error fetching total sales:", error));
+  }, []);
 
-export default function Dashboard() {
+  // Fetch Active Customers
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/customers")
+      .then((response) => setActiveCustomers(response.data.length))
+      .catch((error) =>
+        console.error("Error fetching active customers:", error)
+      );
+  }, []);
+
+  const recentSalesColumns = [
+    { key: "customer", title: "Customer" },
+    {
+      key: "amount",
+      title: "Amount",
+      render: (row: any) => `$${row.amount.toFixed(2)}`,
+    },
+    { key: "status", title: "Status" },
+    { key: "date", title: "Date" },
+  ];
+
+  const lowStockColumns = [
+    { key: "name", title: "Medicine" },
+    { key: "stock", title: "Current Stock" },
+    { key: "threshold", title: "Threshold" },
+    { key: "supplier", title: "Supplier" },
+    {
+      key: "status",
+      title: "Status",
+      render: (row: any) => (
+        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-800">
+          Low Stock
+        </span>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      <PageTitle 
-        title="Dashboard" 
+      <PageTitle
+        title="Dashboard"
         description="Overview of your pharmacy's performance and activity."
       />
-      
+
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Sales"
-          value="$12,765"
+          value={`$${totalSales.toFixed(2)}`}
           icon={<DollarSign className="h-5 w-5" />}
           change={{ value: "12%", positive: true }}
         />
         <StatCard
           title="Active Customers"
-          value="437"
+          value={activeCustomers.toString()}
           icon={<Users className="h-5 w-5" />}
           change={{ value: "5%", positive: true }}
         />
         <StatCard
           title="Medicine Count"
-          value="285"
+          value={medicineCount.toString()}
           icon={<Package className="h-5 w-5" />}
           change={{ value: "3%", positive: true }}
         />
         <StatCard
           title="Low Stock Items"
-          value="12"
+          value={lowStockItems.length.toString()}
           icon={<BarChart3 className="h-5 w-5" />}
           change={{ value: "2", positive: false }}
         />
@@ -151,25 +154,21 @@ export default function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="name" />
                   <YAxis />
-                  <Tooltip 
-                    contentStyle={{ 
+                  <Tooltip
+                    contentStyle={{
                       backgroundColor: "white",
                       borderRadius: "8px",
-                      border: "1px solid #e2e8f0"
-                    }} 
+                      border: "1px solid #e2e8f0",
+                    }}
                     formatter={(value: number) => [`$${value}`, "Sales"]}
                   />
-                  <Bar 
-                    dataKey="total" 
-                    fill="#1EAEDB" 
-                    radius={[4, 4, 0, 0]} 
-                  />
+                  <Bar dataKey="total" fill="#1EAEDB" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader>
             <CardTitle>Recent Sales</CardTitle>
@@ -201,4 +200,6 @@ export default function Dashboard() {
       </Card>
     </div>
   );
-}
+};
+
+export default Dashboard;
