@@ -113,7 +113,7 @@ export default function Login() {
                   <Label htmlFor="password">Password</Label>
                   <a
                     href="#"
-                    className="text-sm font-medium text-pharmacy-primary hover:text-pharmacy-secondary"
+                    className="text-sm font-poppins text-pharmacy-primary hover:text-pharmacy-secondary"
                   >
                     Forgot password?
                   </a>

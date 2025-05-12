@@ -1,68 +1,124 @@
 import { PageTitle } from "@/components/ui/page-title";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, Eye } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 interface Sale {
-  id: string;
-  invoiceNumber: string;
-  customer: string;
-  date: string;
-  amount: number;
-  items: number;
-  status: string;
+  _id: string;
+  customerId: string;
   paymentMethod: string;
+  items: {
+    medicineId: string;
+    medicineName: string;
+    quantity: number;
+    price: number;
+    total: number;
+    _id: string;
+  }[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+interface Customer {
+  _id: string;
+  name: string;
+  // Add any other fields your customer object has if needed
 }
 
 export default function SalesList() {
   const [sales, setSales] = useState<Sale[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    const fetchSales = async () => {
+    const fetchSalesAndCustomers = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/sale/sales"
-        );
-        setSales(response.data);
+        const [salesRes, customersRes] = await Promise.all([
+          axios.get("http://localhost:3000/api/sale/sales"),
+          axios.get("http://localhost:3000/api/customers/")
+        ]);
+
+        setSales(salesRes.data);
+        setCustomers(customersRes.data);
       } catch (err) {
-        setError("Failed to fetch sales data.");
+        setError("Failed to fetch sales or customer data.");
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSales();
+    fetchSalesAndCustomers();
   }, []);
 
+  const getCustomerName = (id: string) => {
+    const customer = customers.find((c) => c._id === id);
+    return customer ? customer.name : "Unknown Customer";
+  };
+
   const columns = [
-    { key: "invoiceNumber", title: "Invoice #" },
-    { key: "customer", title: "Customer" },
-    { key: "date", title: "Date" },
+    {
+      key: "invoiceNumber",
+      title: "Invoice #",
+      render: (row: Sale) => (
+        <div className="font-poppins">{row._id}</div>
+      ),
+    },
+    {
+      key: "customer",
+      title: "Customer",
+      render: (row: Sale) => (
+        <div className="font-poppins">{getCustomerName(row.customerId)}</div>
+      ),
+    },
+    {
+      key: "date",
+      title: "Date",
+      render: (row: Sale) => (
+        <div className="font-poppins">
+          {new Date(row.createdAt).toLocaleDateString()}
+        </div>
+      ),
+    },
     {
       key: "amount",
       title: "Amount",
-      render: (row: Sale) => (
-        <div className="font-medium">${row.amount.toFixed(2)}</div>
-      ),
+      render: (row: Sale) => {
+        const amount = row.total ?? 0;
+        return <div className="font-poppins">${amount.toFixed(2)}</div>;
+      },
     },
     {
       key: "items",
       title: "Items",
-      render: (row: Sale) => <Badge variant="outline">{row.items}</Badge>,
+      render: (row: Sale) => (
+        <div>
+          {row.items.map((item) => (
+            <div key={item._id}>
+              <div>
+                <strong>{item.medicineName}</strong> - {item.quantity} x $
+                {item.price} = ${item.total.toFixed(2)}
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
     },
     {
       key: "paymentMethod",
       title: "Payment Method",
       render: (row: Sale) => (
-        <div className="font-medium">{row.paymentMethod}</div>
+        <div className="font-poppins">{row.paymentMethod}</div>
       ),
     },
     {
@@ -70,26 +126,8 @@ export default function SalesList() {
       title: "Status",
       render: (row: Sale) => (
         <Badge variant="secondary" className="bg-green-100 text-green-800">
-          {row.status}
+          Paid
         </Badge>
-      ),
-    },
-    {
-      key: "actions",
-      title: "Actions",
-      render: (row: Sale) => (
-        <div className="flex space-x-2">
-          <Link to={`/sales/${row.id}`}>
-            <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-              <Eye className="h-4 w-4" />
-            </Button>
-          </Link>
-          <Link to={`/sales/${row.id}/invoice`}>
-            <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-              <FileText className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
       ),
     },
   ];
@@ -111,7 +149,7 @@ export default function SalesList() {
       {error && <div className="text-red-500">{error}</div>}
 
       {!loading && !error && (
-        <DataTable columns={columns} data={sales} keyField="id" />
+        <DataTable columns={columns} data={sales} keyField="_id" />
       )}
     </div>
   );

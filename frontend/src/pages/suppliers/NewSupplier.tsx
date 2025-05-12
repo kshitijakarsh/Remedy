@@ -35,7 +35,7 @@ export default function NewSupplier() {
 
     try {
       await axios.post("http://localhost:3000/api/suppliers", newSupplier);
-      navigate("/suppliers");
+      navigate("/dashboard/suppliers");
     } catch (err: any) {
       setError("Failed to create supplier. Please try again.");
     } finally {

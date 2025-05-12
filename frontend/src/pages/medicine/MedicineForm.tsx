@@ -64,7 +64,7 @@ export default function MedicineForm() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Add New Medicine</h1>
+      <h1 className="text-2xl font-poppins">Add New Medicine</h1>
       <form onSubmit={handleSubmit}>
         <Card>
           <CardContent className="pt-6">

@@ -18,7 +18,7 @@ export function StatCard({ title, value, icon, change, className }: StatCardProp
   return (
     <Card className={cn("overflow-hidden", className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-gray-500">{title}</CardTitle>
+        <CardTitle className="text-sm font-poppins text-gray-500">{title}</CardTitle>
         {icon && <div className="text-pharmacy-primary">{icon}</div>}
       </CardHeader>
       <CardContent>

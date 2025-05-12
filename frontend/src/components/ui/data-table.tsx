@@ -113,7 +113,7 @@ export function DataTable<T>({
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="text-sm font-medium">{currentPage} / {totalPages}</span>
+            <span className="text-sm font-poppins">{currentPage} / {totalPages}</span>
             <Button
               variant="outline"
               size="icon"

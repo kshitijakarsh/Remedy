@@ -276,7 +276,7 @@ const Signup = () => {
                 Already have an account?{" "}
                 <Link
                   to="/login"
-                  className="font-medium text-pharmacy-primary hover:text-pharmacy-secondary"
+                  className="font-poppins text-pharmacy-primary hover:text-pharmacy-secondary"
                 >
                   Sign in
                 </Link>

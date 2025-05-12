@@ -1,19 +1,19 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { 
-  LayoutDashboard, 
-  Pill, 
-  ShoppingCart, 
-  Users, 
-  Truck, 
+import {
+  LayoutDashboard,
+  Pill,
+  ShoppingCart,
+  Users,
+  Truck,
   BarChart3,
   LogOut,
   Menu,
-  X
+  X,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface NavItemProps {
   href: string;
@@ -27,13 +27,16 @@ const NavItem = ({ href, icon: Icon, title, active }: NavItemProps) => {
     <Link
       to={href}
       className={cn(
-        "flex items-center gap-x-2.5 rounded-md px-3 py-2 text-sm font-medium transition-all",
-        active ? 
-          "bg-pharmacy-primary text-white" : 
-          "text-gray-700 hover:bg-pharmacy-light hover:text-pharmacy-primary"
+        "flex items-center gap-x-3 rounded-lg px-3 py-2.5 text-sm font-poppins transition-all duration-200",
+        active
+          ? "bg-pharmacy-primary/10 text-pharmacy-primary border-l-4 border-pharmacy-primary"
+          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
       )}
     >
-      <Icon size={18} />
+      <Icon
+        size={18}
+        className={active ? "text-pharmacy-primary" : "text-gray-500"}
+      />
       {title}
     </Link>
   );
@@ -42,9 +45,20 @@ const NavItem = ({ href, icon: Icon, title, active }: NavItemProps) => {
 export function Sidebar() {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token);
+  }, []);
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/login";
   };
 
   const navItems = [
@@ -80,47 +94,64 @@ export function Sidebar() {
     },
   ];
 
+  // Overlay to close sidebar on mobile when clicking outside
+  const Overlay = isOpen ? (
+    <div
+      className="fixed inset-0 z-30 bg-black/20 backdrop-blur-sm md:hidden"
+      onClick={handleToggle}
+    />
+  ) : null;
+
   return (
     <>
+      {Overlay}
+
       {/* Mobile menu button */}
       <Button
         onClick={handleToggle}
         variant="outline"
         size="icon"
-        className="fixed left-4 top-4 z-50 md:hidden"
+        className="fixed left-4 top-4 z-50 md:hidden rounded-full shadow-sm border-gray-200 bg-white"
       >
         {isOpen ? <X size={20} /> : <Menu size={20} />}
       </Button>
-      
+
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 transform border-r border-gray-200 bg-white transition-transform duration-200 ease-in-out md:relative md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-72 transform border-r border-gray-100 bg-white shadow-sm transition-all duration-300 ease-in-out md:relative md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex h-full flex-col">
-          <div className="flex h-16 items-center border-b border-gray-200 px-6">
+          <div className="flex h-16 items-center border-b border-gray-100 px-6">
             <Link to="/" className="flex items-center gap-x-2">
-              <div className="h-8 w-8 rounded-full bg-pharmacy-primary flex items-center justify-center">
-                <Pill className="h-5 w-5 text-white" />
+              <div className="flex flex-col">
+                <span className="text-lg font-poppins text-gray-900">
+                  Remedy
+                </span>
+                <span className="text-xs text-gray-500">Pharmacy System</span>
               </div>
-              <span className="text-lg font-semibold text-gray-900">Remedy</span>
             </Link>
           </div>
 
-          <div className="flex-1 overflow-auto py-4 px-3">
-            <nav className="flex flex-col gap-y-1">
-              {navItems.map((item) => (
-                <NavItem
-                  key={item.title}
-                  href={item.href}
-                  icon={item.icon}
-                  title={item.title}
-                  active={location.pathname === item.href}
-                />
-              ))}
-            </nav>
+          <div className="flex-1 overflow-auto py-6 px-4">
+            <div className="mb-6">
+              <h3 className="mb-2 px-3 text-xs font-poppins uppercase tracking-wider text-gray-500">
+                Main Menu
+              </h3>
+              <nav className="flex flex-col gap-y-1">
+                {navItems.map((item) => (
+                  <NavItem
+                    key={item.title}
+                    href={item.href}
+                    icon={item.icon}
+                    title={item.title}
+                    active={location.pathname === item.href}
+                  />
+                ))}
+              </nav>
+            </div>
           </div>
         </div>
       </aside>

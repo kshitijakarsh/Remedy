@@ -46,36 +46,9 @@ export default function CustomersList() {
     {
       key: "totalPurchases",
       title: "Total Purchases",
-      render: (row: Customer) => <div className="font-medium">{row.totalPurchases}</div>,
+      render: (row: Customer) => <div className="font-poppins">{row.totalPurchases}</div>,
     },
     { key: "lastVisit", title: "Last Visit" },
-    {
-      key: "actions",
-      title: "Actions",
-      render: (row: Customer) => (
-        <div className="flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <Link to={`/customers/${row.id}`}>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Eye className="mr-2 h-4 w-4" /> View Details
-                </DropdownMenuItem>
-              </Link>
-              <Link to={`/customers/${row.id}/edit`}>
-                <DropdownMenuItem className="cursor-pointer">
-                  <Edit className="mr-2 h-4 w-4" /> Edit Customer
-                </DropdownMenuItem>
-              </Link>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      ),
-    },
   ];
 
   return (

@@ -49,10 +49,12 @@ export default function NewSale() {
     const fetchData = async () => {
       try {
         const [customerRes, medicineRes] = await Promise.all([
-          axios.get("http://localhost:3000/api/sales/customers"),
-          axios.get("http://localhost:3000/api/sales/medicines")
+          axios.get("http://localhost:3000/api/customers"),
+          axios.get("http://localhost:3000/api/medicines/all")
         ]);
+        console.log(customerRes.data);
         setCustomers(customerRes.data);
+        
         setMedicines(medicineRes.data);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -93,7 +95,7 @@ export default function NewSale() {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:3000/api/sales/new", {
+      await axios.post("http://localhost:3000/api/sale/new", {
         customerId,
         paymentMethod,
         items,
@@ -102,7 +104,7 @@ export default function NewSale() {
         total: calculateTotal(),
       });
 
-      navigate("/sales");
+      navigate("/dashboard/sales");
     } catch (err) {
       console.error("Error submitting sale:", err);
     }
@@ -257,7 +259,7 @@ export default function NewSale() {
                     <span>Tax (7%):</span>
                     <span>${calculateTax().toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between font-semibold">
+                  <div className="flex justify-between font-poppins">
                     <span>Total:</span>
                     <span>${calculateTotal().toFixed(2)}</span>
                   </div>
